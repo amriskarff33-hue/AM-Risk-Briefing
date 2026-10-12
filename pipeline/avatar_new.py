@@ -37,6 +37,8 @@ def _grid(img):
         d.line([(0, i), (img.width, i)], fill=(255, 255, 255, alpha), width=1)
     d.polygon([(img.width * 0.55, 0), (img.width, 0), (img.width, img.height * 0.45)], fill=(255, 255, 255, 18))
     d.polygon([(0, img.height * 0.65), (img.width * 0.35, img.height), (0, img.height)], fill=(95, 140, 255, 14))
+    if g.mode != "RGBA": g = g.convert("RGBA")
+    base = base.convert("RGBA")
     return Image.alpha_composite(base, g).convert("RGB")
 
 def _logo(icon_path):
