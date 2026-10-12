@@ -7,3 +7,4 @@ out/
 *.aiff
 *.mp3
 .env
+test.db
