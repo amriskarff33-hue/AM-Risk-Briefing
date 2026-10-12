@@ -1,0 +1,21 @@
+# Aviation safety / ARFF / risk feeds — RSS first, no paywall scraping
+# NOTE 12 Oct 2026: ICAO/FAA/EASA official RSS endpoints return malformed
+# XML (verified). Keep them out until fixed; use working aviation press +
+# GDELT/NewsAPI for incident signal. Re-add officials when validated.
+feeds:
+  - https://www.aerotime.aero/feed
+  - https://simpleflying.com/feed/
+  - https://www.aviation24.be/feed/
+  - https://airlinegeeks.com/feed/
+keywords:
+  - ARFF
+  - aircraft rescue
+  - runway excursion
+  - ground handling
+  - marshalling
+  - fuel farm
+  - emergency response
+  - ICAO Annex
+  - safety bulletin
+max_items: 12
+lookback_hours: 30

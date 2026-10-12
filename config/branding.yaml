@@ -1,0 +1,11 @@
+brand: "AM RISK"
+sub: "Aviation Risk & Training"
+built_by: "Built by IAM-ASI"
+colors:
+  navy: "#0A1628"
+  yellow: "#F5C518"
+  white: "#FFFFFF"
+  red: "#E5484D"
+voice: "en-ZA-LeahNeural"   # edge-tts; change to en-GB / en-US as needed
+presenter_name: "ASI Presenter"
+disclaimer: "Training aid only. Verify against ICAO Annex, AIP and operator manuals."
