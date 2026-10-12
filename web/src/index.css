@@ -1,0 +1,67 @@
+:root {
+  --navy: #0A1628;
+  --navy-deep: #070a11;
+  --yellow: #d6ff3d;
+  --blue: #4fd6ff;
+  --white: #ffffff;
+  --gray: #8fa0bd;
+  --red: #e5484d;
+  --green: #3ce68a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif;
+  background: var(--navy-deep);
+  color: var(--white);
+  line-height: 1.6;
+}
+a { color: var(--blue); text-decoration: none; }
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--yellow); color: #111; }
+.btn-primary:hover:not(:disabled) { background: #e6ff5e; }
+.btn-ghost { background: rgba(255,255,255,0.08); color: var(--white); border: 1px solid rgba(255,255,255,0.15); }
+.btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+.btn-danger { background: var(--red); color: white; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+input, textarea, select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: var(--white);
+  font-size: 14px;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+.card {
+  background: linear-gradient(180deg, rgba(18,34,68,0.9), rgba(10,22,40,0.95));
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge-draft { background: rgba(143,160,189,0.2); color: var(--gray); }
+.badge-pending_review { background: rgba(245,197,24,0.2); color: var(--yellow); }
+.badge-approved { background: rgba(60,230,138,0.2); color: var(--green); }
+.badge-published { background: rgba(79,214,255,0.2); color: var(--blue); }
+.badge-rejected, .badge-failed { background: rgba(229,72,77,0.2); color: var(--red); }
