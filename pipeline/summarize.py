@@ -41,4 +41,4 @@ def build_brief(items):
     # presenter script ~45-60s per 130 words; cap for short-form
     script = ("Good morning from AM Risk. I am your ASI presenter. " + story.strip())[:1200]
     return {"story": story.strip(), "script": script, "disclaimer": DISCLAIMER,
-            "items": items, "provider": provider if story else "extractive"}
+            "items": items, "provider": provider if provider != "none" else "extractive"}

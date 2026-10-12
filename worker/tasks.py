@@ -69,13 +69,41 @@ def generate_brief_task(self, brief_id: int):
         brief.audio_path = str(audio)
         db.commit()
 
-        # 4. video
-        videos = build_video(brief.script, audio, outdir,
-                             brand=cfg.get("brand", "AM RISK"), by=cfg.get("by", "Built by IAM-ASI"))
-        brief.video_path_16 = videos["16x9"]
-        brief.video_path_9 = videos["9x16"]
-        brief.srt_path = videos["srt"]
-        brief.duration = videos["duration"]
+        # 4. video — GPU avatar if available, else Tier-1
+        if settings.GPU_ENABLED:
+            try:
+                from pipeline.gpu_avatar import make_talking_head
+                portrait = outdir / "presenter.png"
+                from pipeline.avatar_new import presenter_card
+                presenter_card(str(portrait), brand=cfg.get("brand", "AM RISK"),
+                               by=cfg.get("by", "Built by IAM-ASI"),
+                               headline=brief.script.split(".")[0] if brief.script else None)
+                video_path = outdir / "briefing-gpu.mp4"
+                make_talking_head(str(portrait), str(audio), str(video_path))
+                # GPU output is 16:9; derive 9:16
+                v9 = outdir / "briefing-9x16.mp4"
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(video_path),
+                                "-vf", "crop=720:720:(in_w-720)/2:(in_h-720)/2,scale=720:1280:flags=lanczos",
+                                "-c:a", "copy", str(v9)], check=True)
+                brief.video_path_16 = str(video_path)
+                brief.video_path_9 = str(v9)
+                brief.duration = videos["duration"] if 'videos' in dir() else 0
+                db.commit()
+            except Exception as e:
+                print(f"[worker] GPU avatar failed ({e}), falling back to Tier-1")
+                brief.status = BriefStatus.failed
+                db.commit()
+                raise self.retry(exc=e)
+        
+        # Tier-1 fallback (or if GPU disabled)
+        if not brief.video_path_16:
+            videos = build_video(brief.script, audio, outdir,
+                                 brand=cfg.get("brand", "AM RISK"), by=cfg.get("by", "Built by IAM-ASI"))
+            brief.video_path_16 = videos["16x9"]
+            brief.video_path_9 = videos["9x16"]
+            brief.srt_path = videos["srt"]
+            brief.duration = videos["duration"]
+        
         brief.status = BriefStatus.pending_review
         db.commit()
         return {"status": "pending_review", "brief_id": brief_id}

@@ -14,7 +14,8 @@ def login(email: str, password: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account disabled")
-    user.last_login = __import__("datetime").datetime.utcnow()
+    from datetime import datetime as _dt
+    user.last_login = _dt.utcnow()
     db.commit()
     return {"access_token": create_access_token({"sub": user.id, "role": user.role.value, "org_id": user.org_id})}
 

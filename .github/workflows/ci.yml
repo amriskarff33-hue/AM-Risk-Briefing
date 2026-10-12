@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: amrisk_test
+          POSTGRES_USER: amrisk
+          POSTGRES_PASSWORD: test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U amrisk"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check api/ worker/ pipeline/ --select E9,F
+
+      - name: Test pipeline
+        env:
+          DATABASE_URL: postgresql://amrisk:test@localhost:5432/amrisk_test
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest tests/ -v --tb=short
+
+      - name: Build web
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build images
+        run: |
+          docker compose build api worker web
+
+      - name: Smoke test
+        run: |
+          docker compose up -d db redis
+          sleep 5
+          docker compose up -d api
+          sleep 5
+          curl -sf http://localhost:8000/health || exit 1
+          docker compose down
