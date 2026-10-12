@@ -5,7 +5,10 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
-from .avatar import presenter_card
+from .avatar_new import presenter_card as presenter_card_new
+
+def presenter_card(*a, **k):
+    return presenter_card_new(*a, **k, headline=k.pop("headline", None))
 from .voice import duration
 
 W, H, FPS = 1280, 720, 12
@@ -56,7 +59,13 @@ def _frame(base, caption, brand, by, zoom):
 
 def build_video(script, audio, outdir, brand="AM RISK", by="Built by IAM-ASI"):
     outdir = Path(outdir); outdir.mkdir(parents=True, exist_ok=True)
-    card = Image.open(presenter_card(outdir / "presenter.png", brand=brand, by=by)).convert("RGB")
+    headline = None
+    try:
+        if script:
+            headline = script.splitlines()[0][:100]
+    except Exception:
+        pass
+    card = Image.open(presenter_card(outdir / "presenter.png", brand=brand, by=by, headline=headline)).convert("RGB")
     dur = duration(audio) if Path(audio).exists() else 20.0
     dur = max(8.0, min(dur, 120.0))
     srt = outdir / "captions.srt"
